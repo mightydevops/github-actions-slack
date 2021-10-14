@@ -1,0 +1,69 @@
+# Dont forget implement env.SLACK_API_TOKEN env.SLACK_CHANNEL_ID
+# We can send to a channel, a thread, update a message in channel but can not do it in thread.
+name: 'GHA slack notification'
+description: 'Notify about workflow state in channel or thread'
+inputs:
+  status:  # id of input
+    description: 'Current workflow status'
+    required: true
+  text:  # id of input
+    description: 'Text to display in message'
+    required: true
+  color: 
+    description: 'Color for attachment'
+    required: false
+    default: ""
+  channel_id:
+    description: 'Target channel id'
+    required: false
+    default: ""
+  thread_ts:
+    description: 'Target thread ts(id)'
+    required: false
+    default: ""
+  message_ts:
+    description: 'Target message ts(id)'
+    required: false
+    default: ""
+outputs:
+  message_ts:
+    description: "message_ts for future update or usage for thread creation"
+    value: ${{ fromJson(steps.send-message.outputs.slack-result).response.message.ts }}
+runs:
+  using: "composite"
+  steps:
+    - id: send-message
+      uses: archive/github-actions-slack@v2.2.3
+      with:
+        slack-bot-user-oauth-access-token: ${{ env.SLACK_API_TOKEN }}
+        slack-channel: ${{ inputs.channel_id || env.SLACK_CHANNEL_ID }}
+        slack-text: " "
+        slack-message-timestamp: ${{ inputs.message_ts }}
+        slack-optional-thread_ts: ${{ inputs.thread_ts }}
+        slack-optional-attachments: |
+          [{
+            "mrkdwn_in": ["text"],
+            "color": "${{ inputs.color }}",
+            "title": "${{ github.workflow }}: ${{ github.job }}",
+            "title_link": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+            "text": "${{ inputs.text }}",
+            "fields": [
+                {
+                    "title": "Status",
+                    "value": "${{ inputs.status }}",
+                    "short": false
+                },
+                {
+                    "title": "Branch",
+                    "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }} | ${{ github.ref }}>",
+                    "short": false
+                },
+                {
+                    "title": "Event",
+                    "value": "${{ github.event_name }}",
+                    "short": false
+                }
+            ],
+            "footer": "<https://github.com/${{ github.repository }} | ${{ github.repository }}>",
+            "footer_icon": "https://github.githubassets.com/favicon.ico",
+          }]
