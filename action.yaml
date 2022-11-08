@@ -40,30 +40,35 @@ runs:
         slack-text: " "
         slack-message-timestamp: ${{ inputs.message_ts }}
         slack-optional-thread_ts: ${{ inputs.thread_ts }}
-        slack-optional-attachments: |
-          [{
-            "mrkdwn_in": ["text"],
-            "color": "${{ inputs.color }}",
-            "title": "${{ github.workflow }}: ${{ github.job }}",
-            "title_link": "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-            "text": "${{ inputs.text }}",
-            "fields": [
-                {
-                    "title": "Status",
-                    "value": "${{ inputs.status }}",
-                    "short": false
-                },
-                {
-                    "title": "Branch",
-                    "value": "<https://github.com/${{ github.repository }}/commit/${{ github.sha }} | ${{ github.ref }}>",
-                    "short": false
-                },
-                {
-                    "title": "Event",
-                    "value": "${{ github.event_name }}",
-                    "short": false
+        slack-blocks: >-
+          [
+              {
+                "block_id": "text1",
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "Building repo *product-service*"
                 }
-            ],
-            "footer": "<https://github.com/${{ github.repository }} | ${{ github.repository }}>",
-            "footer_icon": "https://github.githubassets.com/favicon.ico",
-          }]
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "block_id": "text2",
+                "type": "context",
+                "elements": [
+                  {
+                    "type": "image",
+                    "image_url": "https://upload.wikimedia.org/wikipedia/en/thumb/4/4c/Flag_of_Sweden.svg/1200px-Flag_of_Sweden.svg.png",
+                    "alt_text": "images"
+                  },
+                  {
+                    "type": "plain_text",
+                    "text": "Estimated time: 1 min"
+                  }
+                ]
+              },
+              {
+                "type": "divider"
+              }
+          ]
