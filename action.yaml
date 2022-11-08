@@ -33,7 +33,7 @@ runs:
   using: "composite"
   steps:
     - id: send-message
-      uses: archive/github-actions-slack@v2.2.3
+      uses: archive/github-actions-slack@v2.6.0
       with:
         slack-bot-user-oauth-access-token: ${{ env.SLACK_API_TOKEN }}
         slack-channel: ${{ inputs.channel_id || env.SLACK_CHANNEL_ID }}
